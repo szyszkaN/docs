@@ -141,7 +141,7 @@ Fee_{sell}^{price} =
 \begin{cases} 
 min_-fee_-sell, & \text{if } price_{current} \geq price_-sell_{min} \\ 
 max_-fee_-sell, & \text{if } price_{current} \leq price_-sell_{max} \\ 
-min_-fee_-sell + \frac{max_-fee_-sell - min_-fee_-sell}{price_-sell_{max} - price_-sell_{min}} \cdot (price_{current} - price_-sell_{min}), & \text{otherwise.}
+min_-fee_-sell + \frac{max_-fee_-sell - min_-fee_-sell}{price_-sell_{min} - price_-sell_{max}} \cdot (price_-sell_{min} - price_{current}), & \text{otherwise.}
 \end{cases}
 $$
 
@@ -389,7 +389,11 @@ where:
 Using the estimated hold position and the liquidity provider's position, the loss incurred from providing liquidity, as opposed to simply holding TPRO and ETH, is calculated. This calculation is expressed by the following formula:
 
 $$
-loss = lp_-position - hold_-position \cdot withdrawal_-ratio
+loss = 
+\begin{cases}
+hold_-position * withdrawal_-ratio - lp_-position, & \text{if } lp_-position < hold_-position * withdrawal_-ratio \\
+0, & \text{otherwise.}
+\end{cases}
 $$
 
 <p align="center"><b>Formula 15. Liquidity Provider's Loss</b></p>
@@ -453,10 +457,11 @@ where:
 - $$value_-protection$$ is the value of part of protection applied based on the withdrawal ratio.   
 
 Since the mechanism aims to offset the loss relative to the hold position, the amount of TPRO and ETH received may exceed the loss incurred. In such cases, a surplus is calculated, which is then split into a fee for the creators and a contribution to the protection pool. The surplus for both TPRO and ETH is determined using the following formula:
+
 $$
 protection_-surplus_-eth =
 \begin{cases}
-withdrawal_-ratio \cdot protection_-eth & \text{if } loss \leq 0, \\
+withdrawal_-ratio \cdot protection_-eth & \text{if } loss = 0, \\
 withdrawal_-ratio \cdot protection_-eth \cdot \frac{1 - loss}{value_-protection} & \text{if } loss \leq value_-protection, \\
 0 & \text{otherwise.}
 \end{cases}
@@ -465,7 +470,7 @@ $$
 $$
 protection_-surplus_-token =
 \begin{cases}
-withdrawal_-ratio \cdot protection_-token & \text{if } loss \leq 0, \\
+withdrawal_-ratio \cdot protection_-token & \text{if } loss = 0, \\
 withdrawal_-ratio \cdot protection_-token \cdot \frac{1 - loss}{value_-protection} & \text{if } loss \leq value_-protection, \\
 0 & \text{otherwise.}
 \end{cases}
