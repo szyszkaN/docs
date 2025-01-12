@@ -166,7 +166,7 @@ $$
 eth_-price_-adjusted_-fee = 
 $$
 $$
-\left( \frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1 - eth_-price_-max_-tolerance \right) \cdot \frac{max_-fee_-sell - min_-fee_-sell}{eth_-price_-max_-tolerance - eth_-price_-min_-tolerance} + max_-fee_-sell
+\left(\left| \frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1\right| - eth_-price_-max_-tolerance \right) \cdot \frac{max_-fee_-sell - min_-fee_-sell}{eth_-price_-max_-tolerance - eth_-price_-min_-tolerance} + max_-fee_-sell
 $$
 
 <p align="center"><b>Formula 5. Fee Adjustment Based on ETH Price</b></p>
@@ -186,8 +186,8 @@ This component is subject to specific limitations, outlined in the formula below
 $$
 Fee_{sell}^{eth} =
 \begin{cases} 
-min_-fee_-sell, & \text{if } \frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1 \leq eth_-price_-min_-tolerance, \\  
-max_-fee_-sell, & \text{if } \frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1 \geq eth_-price_-max_-tolerance, \\  
+min_-fee_-sell, & \text{if } \left|\frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1\right| \leq eth_-price_-min_-tolerance, \\  
+max_-fee_-sell, & \text{if } \left|\frac{average_-eth_-price_-24h}{average_-eth_-price_-7d} - 1\right| \geq eth_-price_-max_-tolerance, \\  
 eth_-price_-adjusted_-fee, & \text{otherwise.}
 \end{cases}
 $$
@@ -347,7 +347,7 @@ where:
 - $$withdrawal_-ratio$$ is the proportion of liquidity withdrawn by the liquidity provider,  
 - $$lp_-tokens_-withdrawn$$ is the number of liquidity provider tokens withdrawn by the specific liquidity provider,  
 - $$sum_-lp_-tokens$$ is the total number of liquidity provider tokens in the pool.
-- 
+
 A key step in calculating impermanent loss is estimating the hold position of a given liquidity provider. This involves tracking the assets contributed by the user to the liquidity pool at the time of adding liquidity. When liquidity is withdrawn, the hold position is adjusted by reducing it proportionally to the fraction of liquidity removed. This process is expressed mathematically as follows. Let $$t_{i}$$ denote the moment at which liquidity is added or withdrawn. By $$t_{0}$$ is meant the first addition of liquidity by a liquidity provider, then:
 
 $$
@@ -430,7 +430,8 @@ The liquidity provider receives both TPRO and ETH, with the amounts of each asse
 $$
 received_-protection_-eth =
 \begin{cases}
-protection_-eth & \text{if } loss \geq full_-value_-protection, \\  
+protection_-eth & \text{if } loss \geq full_-value_-protection, \\ 
+0 & \text{if } loss = 0,\\
 withdrawal_-ratio \cdot protection_-eth \cdot \frac{loss}{value_-protection} & \text{if } loss \leq value_-protection, \\  
 protection_-eth \cdot \frac{loss}{full_-value_-protection} & \text{otherwise.}
 \end{cases}
@@ -440,6 +441,7 @@ $$
 received_-protection_-token =
 \begin{cases}
 protection_-token & \text{if } loss \geq full_-value_-protection, \\  
+0 & \text{if } loss = 0, \\
 withdrawal_-ratio \cdot protection_-token \cdot \frac{loss}{value_-protection} & \text{if } loss \leq value_-protection, \\  
 protection_-token \cdot \frac{loss}{full_-value_-protection} & \text{otherwise.}
 \end{cases}
